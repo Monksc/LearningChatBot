@@ -1,4 +1,5 @@
 import java.util.*;
+import java.lang.*;
 public class Response {
     
     public Memory memoryWordsAroundIt = new Memory("wordsAroundIt");
@@ -8,12 +9,14 @@ public class Response {
         
     }
     
-    public String talk(String statement, String topic, int length) {
+    public String talk(String statement) {
         statement = statement.toLowerCase();
         addStatement(statement);
         
+        String topic = getRandomWordOutOfSentence(statement);
+        
 
-        String response = getResponse(statement, topic, length);
+        String response = getResponse(statement, topic);
         if (response.length() > 0) {
             return response;
         }
@@ -21,17 +24,20 @@ public class Response {
         return "k";
     }
     
-    private String getResponse(String statement, String topic, int length) {
+    private String getResponse(String statement, String topic) {
         String response = "";
         String lastWord = topic;
         
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < 50; i++) {
             ArrayList<String> wordBankWordsInSentence = getWords(memoryWordsAroundIt.getString(topic + ".txt"));
             ArrayList<String> wordBankWordsAroundWord = getWords(memoryWordsAssociateWith.getString(lastWord + ".txt"));
         
             String newWord = getSimilarWord(wordBankWordsInSentence, wordBankWordsAroundWord);
             System.out.print(newWord + " ");
             if (newWord == null) {
+                return response;
+            }
+            else if (isThisWordInString(response, newWord)) {
                 return response;
             }
             else {
@@ -54,6 +60,9 @@ public class Response {
         }
         
         return null;
+    }
+    private boolean isThisWordInString(String str, String word) {
+        return (" " + str + " ").indexOf(" " + word + " ") != -1;
     }
     
     private void addStatement(String statement) {
@@ -82,17 +91,11 @@ public class Response {
             }
             
             for (int i = 0; i < words.size() - 1; i++) {
-                //memoryWordsAssociateWith.appendString(words.get(i) + ".txt", words.get(i-1) + " ");
                 memoryWordsAssociateWith.appendString(words.get(i) + ".txt", words.get(i+1) + " ");
             }
-            
-            /*
-            if (words.size() > 1) {
-                memoryWordsAssociateWith.appendString(words.get(0) + ".txt", words.get(1) + " ");
-                memoryWordsAssociateWith.appendString(words.get(words.size() - 1) + ".txt", words.get(words.size() - 2) + " ");
-            }
-            */
-            
+            if (words.size() > 0) {
+                memoryWordsAssociateWith.appendString(words.get(words.size() - 1) + ".txt", "");
+            }            
         }
     }
     
@@ -129,4 +132,11 @@ public class Response {
         }
     }
     
+    private String getRandomWordOutOfSentence(String str) {
+        ArrayList<String> words = getWords(str);
+        
+        int randIndex = (int)(words.size() * Math.random());
+        
+        return words.get(randIndex);
+    }
 }

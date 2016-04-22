@@ -59,7 +59,7 @@ public class Memory {
         try {
             return new String(readFile(name));
         } catch(Exception e) {
-            System.out.println("ERROR: In Memory.java getString(" + name + ") in dir " + DIR);
+            //System.out.println("ERROR: In Memory.java getString(" + name + ") in dir " + DIR);
             return null;
         }
     }
