@@ -13,12 +13,11 @@ public class Response {
         statement = statement.toLowerCase();
         addStatement(statement);
         
-        String topic = getRandomWordOutOfSentence(statement);
-        
+        String topic = getTopic(statement);
 
         String response = getResponse(statement, topic);
         if (response.length() > 0) {
-            return response;
+            return topic + " " + response;
         }
         
         return "k";
@@ -32,8 +31,11 @@ public class Response {
             ArrayList<String> wordBankWordsInSentence = getWords(memoryWordsAroundIt.getString(topic + ".txt"));
             ArrayList<String> wordBankWordsAroundWord = getWords(memoryWordsAssociateWith.getString(lastWord + ".txt"));
         
-            String newWord = getSimilarWord(wordBankWordsInSentence, wordBankWordsAroundWord);
-            System.out.print(newWord + " ");
+            //Collections.reverse(wordBankWordsInSentence);
+            //Collections.reverse(wordBankWordsAroundWord);
+        
+            String newWord = getBestWord(wordBankWordsInSentence, wordBankWordsAroundWord);
+            
             if (newWord == null) {
                 return response;
             }
@@ -47,6 +49,29 @@ public class Response {
         }
         
         return response;
+    }
+    private String getBestWord(ArrayList<String> wordBank1, ArrayList<String> wordBank2) {
+        ArrayList<String> bestWords = new ArrayList<String>();
+        
+        for (String w1: wordBank1) {
+            for (String w2: wordBank2) {
+                if (w1.equals(w2) && w1.length() > 0) {
+                    if (w1.charAt(0) != ' ') {
+                        bestWords.add(w1);
+                    }
+                }   
+            }
+        }
+        
+        if (bestWords.size() > 0) {
+            if (bestWords.size() > 20 && Math.random() > 0.1) {
+                return bestWords.get(bestWords.size() - 1 - (int)(Math.random() * (bestWords.size() / 10)));
+            }
+            
+            return bestWords.get((int)(Math.random() * bestWords.size()));
+        }
+        
+        return null;
     }
     private String getSimilarWord(ArrayList<String> wordBank1, ArrayList<String> wordBank2) {
         for (String w1: wordBank1) {
@@ -138,5 +163,20 @@ public class Response {
         int randIndex = (int)(words.size() * Math.random());
         
         return words.get(randIndex);
+    }
+    
+    private String getTopic(String str) {
+        ArrayList<String> words = getWords(str);
+        int lowest = 99999999;
+        String bestWord = words.get(0);
+        for (String word: words) {
+            int length = memoryWordsAssociateWith.getString(word + ".txt").length();
+            if (length < lowest) {
+                lowest = length;
+                bestWord = word;
+            }
+        }
+        
+        return bestWord;
     }
 }
