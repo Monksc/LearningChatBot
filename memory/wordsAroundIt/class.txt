@@ -1,1 +1,1 @@
-you write helloworld in java by typing in public class helloworld { \n \t public static void main ( string [] args ) { \n \t system you write helloworld in java by typing in public class helloworld 
+you write helloworld in java by typing in public class helloworld { \n \t public static void main ( string [] args ) { \n \t system you write helloworld in java by typing in public class helloworld i have a lot of class 

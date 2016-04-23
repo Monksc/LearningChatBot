@@ -34,7 +34,7 @@ public class Response {
             //Collections.reverse(wordBankWordsInSentence);
             //Collections.reverse(wordBankWordsAroundWord);
         
-            String newWord = getBestWord(wordBankWordsInSentence, wordBankWordsAroundWord);
+            String newWord = getBestWord(wordBankWordsInSentence, wordBankWordsAroundWord, response);
             
             if (newWord == null) {
                 return response;
@@ -50,14 +50,16 @@ public class Response {
         
         return response;
     }
-    private String getBestWord(ArrayList<String> wordBank1, ArrayList<String> wordBank2) {
+    private String getBestWord(ArrayList<String> wordBank1, ArrayList<String> wordBank2, String response) {
         ArrayList<String> bestWords = new ArrayList<String>();
         
         for (String w1: wordBank1) {
             for (String w2: wordBank2) {
                 if (w1.equals(w2) && w1.length() > 0) {
                     if (w1.charAt(0) != ' ') {
-                        bestWords.add(w1);
+                        if ((" " + response + " ").indexOf(" " + w1 + " ") == -1) {
+                            bestWords.add(w1);
+                        }
                     }
                 }   
             }
