@@ -1,0 +1,1 @@
+i can code hello world by typing systemoutprintln("helloworld"); systemoutprintln("helloworld"); is code that prints helloworld 

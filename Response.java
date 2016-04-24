@@ -27,6 +27,8 @@ public class Response {
         String response = "";
         String lastWord = topic;
         
+        String wordsAssociateWith = getWordsAssociativeWith(getWords(statement));
+        
         for (int i = 0; i < 50; i++) {
             ArrayList<String> wordBankWordsInSentence = getWords(memoryWordsAroundIt.getString(topic + ".txt"));
             ArrayList<String> wordBankWordsAroundWord = getWords(memoryWordsAssociateWith.getString(lastWord + ".txt"));
@@ -34,7 +36,7 @@ public class Response {
             //Collections.reverse(wordBankWordsInSentence);
             //Collections.reverse(wordBankWordsAroundWord);
         
-            String newWord = getBestWord(wordBankWordsInSentence, wordBankWordsAroundWord, response);
+            String newWord = getBestWord(wordBankWordsInSentence, wordBankWordsAroundWord, response, wordsAssociateWith);
             
             if (newWord == null) {
                 return response;
@@ -50,7 +52,33 @@ public class Response {
         
         return response;
     }
-    private String getBestWord(ArrayList<String> wordBank1, ArrayList<String> wordBank2, String response) {
+    
+    private String getBestWord(ArrayList<String> wordBank1, ArrayList<String> wordBank2, String response, String statementOfSimilarWords) {
+        ArrayList<String> bestWords = new ArrayList<String>();
+        
+        for (String w1: wordBank1) {
+            for (String w2: wordBank2) {
+                if (w1.equals(w2) && w1.length() > 0) {
+                    if (w1.charAt(0) != ' ') {
+                        if ((" " + response + " ").indexOf(" " + w1 + " ") == -1) {
+                            bestWords.add(w1);
+                        }
+                    }
+                }   
+            }
+        }
+        
+        if (bestWords.size() > 0) {
+            if (bestWords.size() > 1) {
+                return mostRepetiveStringInString(bestWords, statementOfSimilarWords);
+            }
+            
+            return bestWords.get(0);
+        }
+        
+        return null;
+    }
+    private String getBestRandomWord(ArrayList<String> wordBank1, ArrayList<String> wordBank2, String response) {
         ArrayList<String> bestWords = new ArrayList<String>();
         
         for (String w1: wordBank1) {
@@ -180,5 +208,42 @@ public class Response {
         }
         
         return bestWord;
+    }
+
+    private String mostRepetiveStringInString(ArrayList<String> wordBank, String str) {
+        int highestCount = 0;
+        String mostRepetiveWord = "";
+        
+        for (String word: wordBank) {
+            int newCount = howManyTimesDoesWordGoIntoSentence(" " + word + " ", str);
+            if (newCount > highestCount) {
+                mostRepetiveWord = word;
+                highestCount = newCount;
+            }
+        }
+        
+        return mostRepetiveWord;
+    }
+
+    private int howManyTimesDoesWordGoIntoSentence(String word, String str) {
+        int index = str.indexOf(word);
+        int count = 0;
+        
+        while (index != -1) {
+            index = str.indexOf(word, index + 1);
+            count++;
+        }
+        
+        return count;
+    }
+
+    private String getWordsAssociativeWith(ArrayList<String> words) {
+        String str = " ";
+        
+        for (String word: words) {
+            str = str + memoryWordsAroundIt.getString(word + ".txt");
+        }
+        
+        return str;
     }
 }
