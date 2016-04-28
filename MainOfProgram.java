@@ -16,7 +16,7 @@ public class MainOfProgram {
                 System.out.println("\t" + computer.talk(response) + " :Computer");
             }
             
-        } while(!response.equalsIgnoreCase("exit"));
+        } while(!response.equalsIgnoreCase("exit") && !response.equalsIgnoreCase("bye") && !response.equalsIgnoreCase("see ya"));
         
     }
 }

@@ -1,2 +1,3 @@
 Words Around It puts the full sentence in it
 words Associate with is the two words around the word
+firstWord is the first word you respond to the chat bot response

@@ -4,6 +4,9 @@ public class Response {
     
     public Memory memoryWordsAroundIt = new Memory("wordsAroundIt");
     public Memory memoryWordsAssociateWith = new Memory("wordsAssociateWith");
+    public Memory memoryWordsFirstWord = new Memory("firstWord");
+    
+    String firstWordOfComputerResponse = "";
     
     public Response() {
         
@@ -13,25 +16,38 @@ public class Response {
         statement = statement.toLowerCase();
         addStatement(statement);
         
-        String topic = getTopic(statement);
-
-        String response = getResponse(statement, topic);
-        if (response.length() > 0) {
-            return topic + " " + response;
+        if (firstWordOfComputerResponse.length() > 0) {
+            addMemoryForFirstWord(statement);
         }
+        
+        String topic = getTopic(statement);
+        
+        String startingWord = getBestFirstWordResponse(statement, topic);
+        
+        if (startingWord == null){
+            startingWord = topic;
+        }
+
+        String response = getResponse(statement, topic, startingWord);
+        if (response.length() > 0) {
+            firstWordOfComputerResponse = startingWord;
+            return startingWord + " " + response;
+        }
+        
+        firstWordOfComputerResponse = "k";
         
         return "k";
     }
     
-    private String getResponse(String statement, String topic) {
+    private String getResponse(String statement, String topic, String startingWord) {
         String response = "";
-        String lastWord = topic;
+        String lastWord = startingWord;
         
         String wordsAssociateWith = getWordsAssociativeWith(getWords(statement));
         
         for (int i = 0; i < 50; i++) {
             ArrayList<String> wordBankWordsInSentence = getWords(memoryWordsAroundIt.getString(topic + ".txt"));
-            ArrayList<String> wordBankWordsAroundWord = getWords(memoryWordsAssociateWith.getString(lastWord + ".txt"));
+            ArrayList<String> wordBankWordsAroundWord = getWords(memoryWordsAssociateWith.getString(lastWord + ".txt").trim());
         
             //Collections.reverse(wordBankWordsInSentence);
             //Collections.reverse(wordBankWordsAroundWord);
@@ -245,5 +261,54 @@ public class Response {
         }
         
         return str;
+    }
+    
+    private void addMemoryForFirstWord(String statement) {
+        if (statement.length() > 0) {
+            if (statement.indexOf(" ") != -1) {
+                memoryWordsFirstWord.appendString(firstWordOfComputerResponse + ".txt", statement.substring(0, statement.indexOf(" ")) + " ");
+            }
+        }
+    }
+    
+    private ArrayList<String> getAllWordsThatGoIntoString(ArrayList<String> wordBank, String str) {
+        str = " " + str.trim() + " ";
+        ArrayList<String> newWordBank = new ArrayList<String>();
+        for (String word: wordBank) {
+            if ((" " + word + " ").indexOf(str) != -1) {
+                newWordBank.add(word);
+            }
+        }
+        
+        return newWordBank;
+    }
+    
+    private String getBestFirstWordResponse(String statement, String topic) {
+        if (firstWordOfComputerResponse.length() > 0 && statement.indexOf(" ") != -1) {
+            String options = memoryWordsFirstWord.getString(statement.substring(0, statement.indexOf(" ")) + ".txt");
+            
+            if (options != null) {
+                if (options.length() > 0) {
+                    ArrayList<String> words = getWords(options.substring(0, options.length() - 1));
+                    
+                    ArrayList<String> newSetOfWords = getAllWordsThatGoIntoString(words, memoryWordsAroundIt.getString(topic + ".txt"));
+                    
+                    if (newSetOfWords.size() > 0) {
+                        words = newSetOfWords;
+                    }
+                    
+                    if (words.size() > 20) {
+                        int index = words.size() - (int)((1 - Math.pow(Math.random(), 2)) * 20);
+                        return words.get(index);
+                    }
+                    else {
+                        int index = (int)(Math.random() * words.size());
+                        return words.get(index);
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
 }
