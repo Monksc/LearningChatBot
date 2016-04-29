@@ -1,7 +1,7 @@
 import java.util.Scanner;
 public class MainOfProgram {
     
-    public static Response computer = new Response();
+    public static Response2 computer = new Response2("memoryForNicerBot");
     public static Scanner scanner = new Scanner(System.in);
     
     public static void main(String[] args) {

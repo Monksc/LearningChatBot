@@ -6,22 +6,27 @@ public class Response {
     public Memory memoryWordsAssociateWith = new Memory("wordsAssociateWith");
     public Memory memoryWordsFirstWord = new Memory("firstWord");
     
-    String firstWordOfComputerResponse = "";
+    public String firstWordOfComputerResponse = "";
     
-    public Response() {
+    public final String DIR;
+    
+    public Response(String dirOfBot) {
+        DIR = dirOfBot;
         
+        memoryWordsAroundIt = new Memory(DIR + "/wordsAroundIt");
+        memoryWordsAssociateWith = new Memory(DIR + "/wordsAssociateWith");
+        memoryWordsFirstWord = new Memory(DIR + "/firstWord");
     }
     
     public String talk(String statement) {
         statement = statement.toLowerCase();
-        addStatement(statement);
+        addMemoryAsAFull(statement);
         
         if (firstWordOfComputerResponse.length() > 0) {
             addMemoryForFirstWord(statement);
         }
         
         String topic = getTopic(statement);
-        
         String startingWord = getBestFirstWordResponse(statement, topic);
         
         if (startingWord == null){
@@ -30,8 +35,18 @@ public class Response {
 
         String response = getResponse(statement, topic, startingWord);
         if (response.length() > 0) {
-            firstWordOfComputerResponse = startingWord;
-            return startingWord + " " + response;
+            if (startingWord.indexOf("?") == -1 && startingWord.indexOf("!") == -1 && startingWord.indexOf(".") == -1) {
+                response = startingWord + " " + response;
+                firstWordOfComputerResponse = startingWord;
+            }
+            else if (response.indexOf(" ") != -1) {
+                firstWordOfComputerResponse = response.substring(0, response.indexOf(" "));
+            }
+            else {
+                firstWordOfComputerResponse = response;
+            }
+            
+            return response;
         }
         
         firstWordOfComputerResponse = "k";
@@ -136,6 +151,22 @@ public class Response {
         return (" " + str + " ").indexOf(" " + word + " ") != -1;
     }
     
+    private void addMemoryAsAFull(String phrase) {
+        ArrayList<String> words = getWords(phrase);
+            for (String wordName: words) {
+                for (String word: words) {
+                    memoryWordsAroundIt.appendString(wordName + ".txt", word + " ");
+                }
+            }
+            
+            for (int i = 0; i < words.size() - 1; i++) {
+                memoryWordsAssociateWith.appendString(words.get(i) + ".txt", words.get(i+1) + " ");
+            }
+            if (words.size() > 0) {
+                memoryWordsAssociateWith.appendString(words.get(words.size() - 1) + ".txt", "");
+            }   
+    }
+    
     private void addStatement(String statement) {
         ArrayList<String> partsOfStatement = new ArrayList<String>();
         
@@ -151,7 +182,6 @@ public class Response {
         
         addMemory(partsOfStatement);
     }
-    
     private void addMemory(ArrayList<String> phrases) {
         for (String phrase: phrases) {
             ArrayList<String> words = getWords(phrase);

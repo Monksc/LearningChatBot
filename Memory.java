@@ -12,13 +12,13 @@ public class Memory {
     }
     
     private byte[] readFile(String fileName) throws IOException {
-        Path path = Paths.get("memory/" + DIR + "/" + fileName);
+        Path path = Paths.get(DIR + "/" + fileName);
         
         return Files.readAllBytes(path);
     }
     
     private void writeFile(String fileName, byte[] aBytes) throws IOException {
-        Path path = Paths.get("memory/" + DIR + "/" + fileName);
+        Path path = Paths.get(DIR + "/" + fileName);
         Files.write(path, aBytes); //creates, overwrites
     }
     
@@ -60,7 +60,8 @@ public class Memory {
             return new String(readFile(name));
         } catch(Exception e) {
             //System.out.println("ERROR: In Memory.java getString(" + name + ") in dir " + DIR);
-            return null;
+            return "";
+            //return null;
         }
     }
     public boolean appendString(String name, String newStr) {
